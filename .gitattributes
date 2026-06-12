@@ -1,6 +1,0 @@
-# Force GitHub Linguist to recognize PHP correctly
-*.php linguist-language=PHP
-
-# Classify CSS and JS properly
-*.css linguist-language=CSS
-*.js linguist-language=JavaScript
