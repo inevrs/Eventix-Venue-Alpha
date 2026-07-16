@@ -37,13 +37,28 @@ $existing_payment = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM pay
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$existing_payment) {
     $method = mysqli_real_escape_string($connect, $_POST['method']);
-    $sql = "INSERT INTO payments (booking_id, amount, method, status, paid_at)
-            VALUES ($booking_id, $grand_total, '$method', 'paid', NOW())";
-    if (mysqli_query($connect, $sql)) {
-        $success = "Payment successful! Your booking is paid and pending manager approval.";
-        $existing_payment = true; // flag it so we don't show form again
+    
+    $dest = '';
+    if (isset($_FILES['payment_proof']) && $_FILES['payment_proof']['error'] === 0) {
+        $upload_dir = '../uploads/payments/';
+        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+        $ext = pathinfo($_FILES['payment_proof']['name'], PATHINFO_EXTENSION);
+        $filename = 'proof_' . $booking_id . '_' . time() . '.' . $ext;
+        $dest = 'uploads/payments/' . $filename;
+        move_uploaded_file($_FILES['payment_proof']['tmp_name'], '../' . $dest);
+    }
+
+    if ($dest === '') {
+        $error = "Please upload a valid payment proof picture.";
     } else {
-        $error = "Payment failed. Please try again.";
+        $sql = "INSERT INTO payments (booking_id, amount, method, status, payment_proof, paid_at)
+                VALUES ($booking_id, $grand_total, '$method', 'paid', '$dest', NOW())";
+        if (mysqli_query($connect, $sql)) {
+            $success = "Payment successful! Your booking is paid and pending manager approval.";
+            $existing_payment = true; // flag it so we don't show form again
+        } else {
+            $error = "Payment failed. Please try again.";
+        }
     }
 }
 ?>
@@ -181,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$existing_payment) {
             <div class="bg-yellow-50 text-yellow-700 px-4 py-3 rounded-lg text-sm mb-6">
                 ⏳ Please complete your payment to submit your booking for manager approval.
             </div>
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="mb-5">
                     <label>Select Method</label>
                     <select name="method" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-sans text-text focus:border-pink-main focus:ring-2 focus:ring-pink-main/10 outline-none transition-all cursor-pointer pr-10" required>
@@ -190,6 +205,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$existing_payment) {
                         <option value="Debit Card">Debit Card</option>
                         <option value="eWallet">eWallet (Touch 'n Go / GrabPay)</option>
                     </select>
+                </div>
+                <div class="mb-5">
+                    <label class="block text-[11px] font-semibold tracking-wider uppercase text-text-muted mb-2">Upload Payment Proof (Screenshot / Receipt)</label>
+                    <input type="file" name="payment_proof" accept="image/*" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm outline-none" required>
                 </div>
                 <button type="submit" class="bg-pink-main text-white px-6 py-2.5 rounded-full hover:bg-pink-dark transition-all hover:-translate-y-px active:scale-95 shadow-md hover:shadow-lg" style="width:100%">
                     Pay RM<?= number_format($grand_total, 2) ?> →

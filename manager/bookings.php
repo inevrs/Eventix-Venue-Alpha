@@ -15,10 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['status'], $_POST['boo
 }
 
 $bookings = mysqli_query($connect, "
-    SELECT b.*, u.full_name, u.email, v.name AS venue_name
+    SELECT b.*, u.full_name, u.email, v.name AS venue_name, p.payment_proof, p.status AS payment_status
     FROM bookings b
     JOIN users u ON b.user_id=u.id
     JOIN venues v ON b.venue_id=v.id
+    LEFT JOIN payments p ON b.id=p.booking_id
     WHERE v.manager_id=$manager_id
     ORDER BY b.created_at DESC
 ");
@@ -68,6 +69,7 @@ $bookings = mysqli_query($connect, "
                             <th class="px-6 py-4 border-b border-gray-100">Venue</th>
                             <th class="px-6 py-4 border-b border-gray-100">Event Date</th>
                             <th class="px-6 py-4 border-b border-gray-100">Guests</th>
+                            <th class="px-6 py-4 border-b border-gray-100">Payment Proof</th>
                             <th class="px-6 py-4 border-b border-gray-100">Status</th>
                             <th class="px-6 py-4 border-b border-gray-100">Action</th>
                         </tr>
@@ -77,7 +79,7 @@ $bookings = mysqli_query($connect, "
                         $rows = [];
                         while ($row = mysqli_fetch_assoc($bookings)) $rows[] = $row;
                         if (empty($rows)): ?>
-                        <tr><td colspan="7" class="px-6 py-12 text-center text-text-muted">
+                        <tr><td colspan="8" class="px-6 py-12 text-center text-text-muted">
                             <p style="font-size:32px;margin-bottom:8px">📅</p>
                             <p class="font-semibold mb-1">No bookings yet</p>
                             <p class="text-sm">Bookings from customers will appear here.</p>
@@ -90,6 +92,15 @@ $bookings = mysqli_query($connect, "
                             <td class="px-6 py-4 border-b border-gray-100 text-text"><?= htmlspecialchars($row['venue_name']) ?></td>
                             <td class="px-6 py-4 border-b border-gray-100 text-text"><?= date('d M Y', strtotime($row['start_date'])) ?> to <?= date('d M Y', strtotime($row['end_date'])) ?></td>
                             <td class="px-6 py-4 border-b border-gray-100 text-text"><?= $row['guest_count'] ?></td>
+                            <td class="px-6 py-4 border-b border-gray-100 text-text">
+                                <?php if (!empty($row['payment_proof'])): ?>
+                                    <a href="/eventix/<?= htmlspecialchars($row['payment_proof']) ?>" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-pink-main font-semibold hover:underline">
+                                        📄 View Proof
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-xs text-text-muted">Unpaid / No Proof</span>
+                                <?php endif; ?>
+                            </td>
                             <td class="px-6 py-4 border-b border-gray-100 text-text">
                                 <span class="<?= $row['status']==='confirmed' ? 'bg-green-100 text-green-700' : ($row['status']==='pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') ?> px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
                                     <?= ucfirst($row['status']) ?>

@@ -138,7 +138,6 @@ if (isset($_GET['deleted'])) {
                 <div class="grid gap-3">
                     <a href="venues.php" class="block rounded-2xl border border-gray-200 bg-pink-light px-4 py-3 text-sm font-semibold text-pink-dark hover:bg-pink-light/90 transition">Book a venue</a>
                     <a href="my_bookings.php" class="block rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-text hover:bg-gray-50 transition">View saved / previous bookings</a>
-                    <a href="profile.php" class="block rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-text hover:bg-gray-50 transition">Update profile</a>
                 </div>
             </div>
 

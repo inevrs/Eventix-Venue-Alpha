@@ -19,6 +19,7 @@ if ($role === 'admin')    $brand_link = '/eventix/admin/dashboard.php';
     <ul class="flex items-center gap-2 list-none m-0 p-0 relative z-10" id="navMenu">
         <?php if (!$role): ?>
             <li><a href="/eventix/index.php" class="text-sm font-medium px-4 py-2 rounded-full transition-colors <?= $current === 'index.php' ? 'bg-accent text-white' : 'text-muted hover:text-text relative z-10' ?>"><?= translate('explore_venues', $lang) ?></a></li>
+            <li><a href="/eventix/about.php" class="text-sm font-medium px-4 py-2 rounded-full transition-colors <?= $current === 'about.php' ? 'bg-accent text-white' : 'text-muted hover:text-text relative z-10' ?>">About Us</a></li>
         <?php elseif ($role === 'customer'): ?>
             <li><a href="/eventix/customer/venues.php" class="text-sm font-medium px-4 py-2 rounded-full transition-colors <?= $current === 'venues.php' ? 'bg-accent text-white' : 'text-muted hover:text-text relative z-10' ?>"><?= translate('venues', $lang) ?></a></li>
             <li><a href="/eventix/customer/my_bookings.php" class="text-sm font-medium px-4 py-2 rounded-full transition-colors <?= $current === 'my_bookings.php' ? 'bg-accent text-white' : 'text-muted hover:text-text relative z-10' ?>"><?= translate('my_bookings', $lang) ?></a></li>
