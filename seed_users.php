@@ -214,7 +214,7 @@ foreach ($user_ids as $uid) {
         elseif ($rand_status <= 85) $status = 'pending';
         else $status = 'cancelled';
 
-        $created_at = date('Y-m-d H:i:s', strtotime($start . " -{$days_diff} days", strtotime("-" . rand(5, 30) . " days", strtotime($start))));
+        $created_at = date('Y-m-d H:i:s', strtotime($start . " - " . rand(5, 30) . " days"));
 
         $sql = "INSERT INTO bookings (user_id, venue_id, start_date, end_date, guest_count, notes, status, created_at)
                 VALUES ($uid, $vid, '$start', '$end', $guests, '$note', '$status', '$created_at')";
